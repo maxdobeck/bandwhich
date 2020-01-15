@@ -123,7 +123,9 @@ pub fn get_input(
     if available_network_frames.is_empty() {
         for (_, iface) in network_frames {
             if let Some(iface_error) = iface.err() {
-                if let ErrorKind::PermissionDenied = iface_error.kind() {
+                if ErrorKind::PermissionDenied == iface_error.kind()
+                    || (cfg!(target_os = "macos") && (ErrorKind::NotFound == iface_error.kind()))
+                {
                     failure::bail!(eperm_message())
                 }
             }
